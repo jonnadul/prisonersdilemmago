@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func RunGame(pA Prisoner, pB Prisoner, numIter int) (err error) {
+func RunGame(pA Strategy, pB Strategy, numIter int) (err error) {
 
 	fmt.Println("Starting Game!")
 
@@ -15,61 +15,41 @@ func RunGame(pA Prisoner, pB Prisoner, numIter int) (err error) {
 	pBScore := 0
 
 	for i := 0; i < numIter; i++ {
-		var pAAction rune
-		var pBAction rune
+		var pAAction Action
+		var pBAction Action
 
 		fmt.Println("Iteration " + strconv.Itoa(i))
 
-		for pAAction != 's' && pAAction != 'b' {
-			fmt.Println("What should Prisoner " + pA.name + " do? [s/b]")
-			reader := bufio.NewReader(os.Stdin)
-			pAAction, _, err = reader.ReadRune()
-			if err != nil {
-				return err
-			}
+		pAAction, err = pA.Decide()
+		if err != nil {
+			return
 		}
 
-		if pAAction == 's' {
-			pA.action = Silent
-		} else {
-			pA.action = Betray
+		pBAction, err = pB.Decide()
+		if err != nil {
+			return
 		}
-
-		for pBAction != 's' && pBAction != 'b' {
-			fmt.Println("What should Prisoner " + pB.name + " do? [s/b]")
-			reader := bufio.NewReader(os.Stdin)
-			pBAction, _, err = reader.ReadRune()
-			if err != nil {
-				return err
-			}
-		}
-
-		if pBAction == 's' {
-			pB.action = Silent
-		} else {
-			pB.action = Betray
-		}
-
-		pA.Print()
-		pB.Print()
 
 		examine := NewExamine()
 
-		sentence := examine.CrossExamine(pA.action, pB.action)
+		sentence := examine.CrossExamine(pAAction, pBAction)
 
 		pAScore += sentence.forA
 		pBScore += sentence.forB
 
-		fmt.Println("Prisoner " + pA.name + " sentenced to " + strconv.Itoa(sentence.forA) + " current total " + strconv.Itoa(pAScore))
-		fmt.Println("Prisoner " + pB.name + " sentenced to " + strconv.Itoa(sentence.forB) + " current total " + strconv.Itoa(pBScore))
+		fmt.Println("Prisoner A sentenced to " + strconv.Itoa(sentence.forA) + " current total " + strconv.Itoa(pAScore))
+		fmt.Println("Prisoner B sentenced to " + strconv.Itoa(sentence.forB) + " current total " + strconv.Itoa(pBScore))
+
+		pA.SetOpponentDecision(pBAction)
+		pB.SetOpponentDecision(pAAction)
 	}
 
 	return nil
 }
 
 func main() {
-	pA := NewPrisoner("Alice")
-	pB := NewPrisoner("Bob")
+	upA := UserPrompt{prisoner: NewPrisoner("Alice"), reader: bufio.NewReader(os.Stdin)}
+	upB := UserPrompt{prisoner: NewPrisoner("Bob"), reader: bufio.NewReader(os.Stdin)}
 
-	RunGame(pA, pB, 10)
+	RunGame(upA, upB, 10)
 }
