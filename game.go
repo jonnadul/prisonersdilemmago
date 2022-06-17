@@ -1,57 +1,75 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
 )
 
-type Sentence struct {
-	forA int
-	forB int
-}
+func RunGame(pA Prisoner, pB Prisoner, numIter int) (err error) {
 
-type Game struct {
-	policy map[Action](map[Action]Sentence)
-}
+	fmt.Println("Starting Game!")
 
-func NewGame() Game {
-	policy := make(map[Action](map[Action]Sentence))
-	policy[Silent] = make(map[Action]Sentence)
-	policy[Silent][Silent] = Sentence{forA:-1, forB:-1}
-	policy[Silent][Betray] = Sentence{forA:-3, forB:0}
+	pAScore := 0
+	pBScore := 0
 
-	policy[Betray] = make(map[Action]Sentence)
-	policy[Betray][Silent] = Sentence{forA:0, forB:-3}
-	policy[Betray][Betray] = Sentence{forA:-2, forB:-2}
+	for i := 0; i < numIter; i++ {
+		var pAAction rune
+		var pBAction rune
 
-	return Game{policy:policy}
-}
+		fmt.Println("Iteration " + strconv.Itoa(i))
 
-func (g *Game) CrossExamine(pA Prisoner, pB Prisoner) Sentence {
-	return g.policy[pA.action][pB.action]
+		for pAAction != 's' && pAAction != 'b' {
+			fmt.Println("What should Prisoner " + pA.name + " do? [s/b]")
+			reader := bufio.NewReader(os.Stdin)
+			pAAction, _, err = reader.ReadRune()
+			if err != nil {
+				return err
+			}
+		}
+
+		if pAAction == 's' {
+			pA.action = Silent
+		} else {
+			pA.action = Betray
+		}
+
+		for pBAction != 's' && pBAction != 'b' {
+			fmt.Println("What should Prisoner " + pB.name + " do? [s/b]")
+			reader := bufio.NewReader(os.Stdin)
+			pBAction, _, err = reader.ReadRune()
+			if err != nil {
+				return err
+			}
+		}
+
+		if pBAction == 's' {
+			pB.action = Silent
+		} else {
+			pB.action = Betray
+		}
+
+		pA.Print()
+		pB.Print()
+
+		examine := NewExamine()
+
+		sentence := examine.CrossExamine(pA.action, pB.action)
+
+		pAScore += sentence.forA
+		pBScore += sentence.forB
+
+		fmt.Println("Prisoner " + pA.name + " sentenced to " + strconv.Itoa(sentence.forA) + " current total " + strconv.Itoa(pAScore))
+		fmt.Println("Prisoner " + pB.name + " sentenced to " + strconv.Itoa(sentence.forB) + " current total " + strconv.Itoa(pBScore))
+	}
+
+	return nil
 }
 
 func main() {
-	pA := NewPrisoner("A")
-	pB := NewPrisoner("B")
+	pA := NewPrisoner("Alice")
+	pB := NewPrisoner("Bob")
 
-	pA.Print()
-	pB.Print()
-
-	g := NewGame()
-
-	sentence := g.CrossExamine(pA, pB)
-
-	fmt.Println("PrisonerA sentenced to ", sentence.forA)
-	fmt.Println("PrisonerB sentenced to ", sentence.forB)
-
-	pA.StaySilent()
-	pB.Betray()
-
-	pA.Print()
-	pB.Print()
-
-	sentence = g.CrossExamine(pA, pB)
-
-	fmt.Println("PrisonerA sentenced to ", sentence.forA)
-	fmt.Println("PrisonerB sentenced to ", sentence.forB)
+	RunGame(pA, pB, 10)
 }

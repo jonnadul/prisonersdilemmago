@@ -12,12 +12,12 @@ const (
 )
 
 type Prisoner struct {
-	name string
+	name   string
 	action Action
 }
 
 func NewPrisoner(name string) Prisoner {
-	return Prisoner{name:name, action:Silent}
+	return Prisoner{name: name, action: Silent}
 }
 
 func (p *Prisoner) StaySilent() {
@@ -37,6 +37,7 @@ func (p *Prisoner) Print() {
 		fmt.Println(" betrays.")
 	}
 }
+
 /*
 func main() {
 	prisonerA := NewPrisoner("A")
