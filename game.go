@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strconv"
 )
 
@@ -48,8 +46,8 @@ func RunGame(pA Strategy, pB Strategy, numIter int) (err error) {
 }
 
 func main() {
-	upA := UserPrompt{prisoner: NewPrisoner("Alice"), reader: bufio.NewReader(os.Stdin)}
-	upB := UserPrompt{prisoner: NewPrisoner("Bob"), reader: bufio.NewReader(os.Stdin)}
+	upA := NewRandom()
+	upB := NewAlways(true)
 
 	RunGame(upA, upB, 10)
 }

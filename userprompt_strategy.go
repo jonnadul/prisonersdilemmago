@@ -3,11 +3,16 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"os"
 )
 
 type UserPrompt struct {
 	prisoner Prisoner
 	reader   *bufio.Reader
+}
+
+func NewUserPrompt() UserPrompt {
+	return UserPrompt{prisoner: NewPrisoner("User Prompt"), reader: bufio.NewReader(os.Stdin)}
 }
 
 func (up UserPrompt) Decide() (action Action, err error) {
