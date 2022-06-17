@@ -46,8 +46,8 @@ func RunGame(pA Strategy, pB Strategy, numIter int) (err error) {
 }
 
 func main() {
-	upA := NewRandom()
-	upB := NewAlways(true)
+	upA := NewTitForTat()
+	upB := NewRandom()
 
 	RunGame(upA, upB, 10)
 }
