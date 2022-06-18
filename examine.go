@@ -1,8 +1,8 @@
 package main
 
 type Sentence struct {
-	forA int
-	forB int
+	forA float64
+	forB float64
 }
 
 type Examine struct {
