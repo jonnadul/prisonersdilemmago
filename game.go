@@ -73,10 +73,10 @@ func main() {
 	line := charts.NewLine()
 
 	line.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{Theme: types.ThemeWesteros}),
+		charts.WithInitializationOpts(opts.Initialization{Theme: types.ThemeInfographic}),
 		charts.WithTitleOpts(opts.Title{
-			Title:    "Line example in Westeros theme",
-			Subtitle: "Line chart rendered by the http server this time",
+			Title:    upA.prisoner.name + " vs " + upB.prisoner.name,
+			Subtitle: "Accumulation of sentence per iteration of Prisoners Dilemma",
 		}))
 
 	// Put data into instance
